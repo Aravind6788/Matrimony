@@ -1,8 +1,4 @@
-
 <?php
-#error_reporting(E_ALL);
-#ini_set('display_errors', 1);
-
 function mysqlexec($sql){
 	$host="localhost"; // Host name
 	$username="root"; // Mysql username
@@ -25,20 +21,12 @@ function mysqlexec($sql){
 }
 function searchid(){
 	if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-		$profid = $_POST['profid'];
-		$sql = "SELECT * FROM customer WHERE id = $profid";
+		$profid=$_POST['profid'];
+		$sql="SELECT * FROM customer WHERE id=$profid";
 		$result = mysqlexec($sql);
-		if (mysqli_num_rows($result) == 0) {
-			// No record found with the specified id
-			return " No record found with id: $profid";
-			
-		} else {
-			
-			return $result;
-		}
+    	return $result;
 	}
 }
-
 
 function search(){
   if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -118,62 +106,36 @@ function writepartnerprefs($id){
 
 function register(){
 	if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-		$uname=$_POST['name'];
-		$pass=$_POST['pass'];
-		$email=$_POST['email'];
+	$uname=$_POST['name'];
+	$pass=$_POST['pass'];
+	$email=$_POST['email'];
+	$day=$_POST['day'];
+	$month=$_POST['month'];
+	$year=$_POST['year'];
 		$day=$_POST['day'];
 		$month=$_POST['month'];
 		$year=$_POST['year'];
-		$dob=$year ."-" . $month . "-" .$day ;
-		$gender=$_POST['gender'];
-		
-		require_once("includes/dbconn.php");
+	$dob=$year ."-" . $month . "-" .$day ;
+	$gender=$_POST['gender'];
+	require_once("includes/dbconn.php");
 
-		$sql1 = "INSERT INTO users (profilestat, username, password, email, dateofbirth, gender, userlevel) 
-				VALUES (0, '$uname', '$pass', '$email', '$dob', '$gender', 0)";
+	$sql = "INSERT 
+			INTO
+			   users
+			   ( profilestat, username, password, email, dateofbirth, gender, userlevel) 
+			VALUES
+			   (0, '$uname', '$pass', '$email', '$dob', '$gender', 0)";
 
-		if (mysqli_query($conn,$sql1)) {
-			// Retrieve the auto-generated ID from the users table
-			$cust_id = mysqli_insert_id($conn);
-			
-			// Insert a new row into the partnerpref table using the retrieved ID
-			$sql2 = "INSERT INTO partnerprefs (custId,agemin,agemax,maritalstatus,complexion,height,diet,religion,caste,subcaste,mothertounge,education,occupation,country,descr) 
-					VALUES ('$cust_id',NULL,NULL,'','',NULL,'','','','','','','','','')";
-
-			$sql3 = "INSERT INTO customer (cust_id,email,age,height,sex,religion,caste,subcaste,district,state,country,maritalstatus,profilecreatedby,education,education_sub,firstname,lastname,body_type,physical_status,drink,mothertounge,colour,weight,blood_group,diet,smoke,dateofbirth,occupation,occupation_descr,annual_income,fathers_occupation,mothers_occupation,no_bro,no_sis,aboutme,profilecreationdate) 
-        			 VALUES ('$cust_id','','',NULL,'','','',NULL,'','','','',NULL,'',NULL,'','','','','','','',NULL,'','','',NULL,'','','','','',NULL,NULL,'',CURRENT_TIMESTAMP)";
-			
-			$sql4="INSERT INTO photos (cust_id,pic1,pic2,pic3,pic4)
-					VALUES ('$cust_id',NULL,NULL,NULL,NULL)";
-
-			if (mysqli_query($conn,$sql2)){
-			
-				if (mysqli_query($conn,$sql3))
-				{
-					/*if(mysqli_query($conn,$sql4))
-					{*/
-						echo "Successfully Registered";
-						echo "<a href=\"login.php\">";
-						echo "Login to your account";
-						echo "</a>";
-					/*}
-					else{
-						echo "Error : " . $sql4 ."<br>".$conn->error;
-					}*/
-				}
-				else {
-					echo "Error: " . $sql3 . "<br>" . $conn->error;
-				}
-			}
-			else{
-				echo "Error: " . $sql2 . "<br>" . $conn->error;
-			}
-		} else {
-			echo "Error: " . $sql1 . "<br>" . $conn->error;
-		}
+	if (mysqli_query($conn,$sql)) {
+	  echo "Successfully Registered";
+	  echo "<a href=\"login.php\">";
+	  echo "Login to your account";
+	  echo "</a>";
+	} else {
+	  echo "Error: " . $sql . "<br>" . $conn->error;
 	}
 }
-
+}
 
 function isloggedin(){
 	if(!isset($_SESSION['id'])){
@@ -308,57 +270,54 @@ if(mysqli_num_rows($result)>=1){
 //function for upload photo
 
 function uploadphoto($id){
-    $target = "profile/". $id;
-    if (!file_exists($target)) 
-	{
-		mkdir($target, 0777, true);
-        if(!is_writable($target)) {
-            die('Failed to create directory: ' . $target . ' - Permission denied');
-        }
-	}
-    //specifying target for each file
-    $target1 = $target . '/' . basename( $_FILES['pic1']['name']);
-    $target2 = $target . '/' . basename( $_FILES['pic2']['name']);
-    $target3 = $target . '/' . basename( $_FILES['pic3']['name']);
-    $target4 = $target . '/' . basename( $_FILES['pic4']['name']);
+	$target = "profile/". $id ."/";
+if (!file_exists($target)) {
+    mkdir($target, 0777, true);
+}
+//specifying target for each file
+$target1 = $target . basename( $_FILES['pic1']['name']);
+$target2 = $target . basename( $_FILES['pic2']['name']);
+$target3 = $target . basename( $_FILES['pic3']['name']);
+$target4 = $target . basename( $_FILES['pic4']['name']);
 
-    // This gets all the other information from the form
-    $pic1=($_FILES['pic1']['name']);
-    $pic2=($_FILES['pic2']['name']);
-    $pic3=($_FILES['pic3']['name']);
-    $pic4=($_FILES['pic4']['name']);
 
-    $sql="SELECT id FROM photos WHERE cust_id = '$id'";
-    $result = mysqlexec($sql);
+// This gets all the other information from the form
+$pic1=($_FILES['pic1']['name']);
+$pic2=($_FILES['pic2']['name']);
+$pic3=($_FILES['pic3']['name']);
+$pic4=($_FILES['pic4']['name']);
 
-    //code part to check weather a photo already exists
-    if(mysqli_num_rows($result) == 0) {
-        // no photo for current user, do stuff...
-        $sql="INSERT INTO photos (cust_id, pic1, pic2, pic3, pic4) VALUES ('$id', '$pic1' ,'$pic2', '$pic3','$pic4')";
-        // Writes the information to the database
-        if(!mysqlexec($sql)) {
-            die('Failed to insert data into the database');
-        }   
-    } else {
-        // There is a photo for customer so up
-        $sql="UPDATE photos SET pic1 = '$pic1', pic2 = '$pic2', pic3 = '$pic3', pic4 = '$pic4' WHERE cust_id=$id";
-        // Writes the information to the database
-        if(!mysqlexec($sql)) {
-            die('Failed to update data in the database');
-        }   
-    }
+$sql="SELECT id FROM photos WHERE cust_id = '$id'";
+$result = mysqlexec($sql);
 
-    // Writes the photo to the server
-    if(move_uploaded_file($_FILES['pic1']['tmp_name'], $target1) || move_uploaded_file($_FILES['pic2']['tmp_name'], $target2) || move_uploaded_file($_FILES['pic3']['tmp_name'], $target3) || move_uploaded_file($_FILES['pic4']['tmp_name'], $target4))
-    {
-        // Tells you if its all ok
-        echo "The files has been uploaded, and your information has been added to the directory";
-    }
-    else {
-        // Gives an error if it's not
-        die("Sorry, there was a problem uploading your file.");
-    }
+//code part to check weather a photo already exists
+if(mysqli_num_rows($result) == 0) {
+     // no photo for curret user, do stuff...
+		$sql="INSERT INTO photos (id, cust_id, pic1, pic2, pic3, pic4) VALUES ('', '$id', '$pic1' ,'$pic2', '$pic3','$pic4')";
+		// Writes the information to the database
+		mysqlexec($sql);
+
+		
+} else {
+    // There is a photo for customer so up
+     $sql="UPDATE photos SET pic1 = '$pic1', pic2 = '$pic2', pic3 = '$pic3', pic4 = '$pic4' WHERE cust_id=$id";
+		// Writes the information to the database
+	mysqlexec($sql);
 }
 
+// Writes the photo to the server
+if(move_uploaded_file($_FILES['pic1']['tmp_name'], $target1)&&move_uploaded_file($_FILES['pic2']['tmp_name'], $target2)&&move_uploaded_file($_FILES['pic3']['tmp_name'], $target3)&&move_uploaded_file($_FILES['pic4']['tmp_name'], $target4))
+{
+
+// Tells you if its all ok
+echo "The files has been uploaded, and your information has been added to the directory";
+}
+else {
+
+// Gives and error if its not
+echo "Sorry, there was a problem uploading your file.";
+}
+
+}//end uploadphoto function
 
 ?>
