@@ -361,22 +361,30 @@ $(document).ready(function(){
 //getting partner prefernce
 $sql = "SELECT * FROM partnerprefs WHERE custId = $id";
 $result = mysqlexec($sql);
-$row= mysqli_fetch_assoc($result);
+// Check if there is a result
+if ($result && mysqli_num_rows($result) > 0) {
+    $row = mysqli_fetch_assoc($result);
 
-$agemin=$row['agemin'];
-$agemax=$row['agemax'];
-$maritalstatus=$row['maritalstatus'];
-$complexion=$row['complexion'];
-$height=$row['height'];
-$diet=$row['diet'];
-$religion=$row['religion'];
-$caste=$row['caste'];
-$mothertounge=$row['mothertounge'];
-$education=$row['education'];
-$occupation=$row['occupation'];
-$country=$row['country'];
-$descr=$row['descr'];
-
+    // Use a different variable name for the loop to avoid conflicts
+    foreach ($row as $value) {
+        $agemin = $value['agemin'];
+        $agemax = $value['agemax'];
+        $maritalstatus = $value['maritalstatus'];
+        $complexion = $value['complexion'];
+        $height = $value['height'];
+        $diet = $value['diet'];
+        $religion = $value['religion'];
+        $caste = $value['caste'];
+        $mothertongue = $value['mothertongue'];
+        $education = $value['education'];
+        $occupation = $value['occupation'];
+        $country = $value['country'];
+        $descr = $value['descr'];
+    }
+} else {
+    // Handle the case where there is no result
+    echo "";
+}
 
 
 ?>
