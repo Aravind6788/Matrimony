@@ -69,9 +69,11 @@ if($result2){
 	$pic3=$row2['pic3'];
 	$pic4=$row2['pic4'];
 }
-}else{
-	echo "<script>alert(\"User ID not found\")</script>";
+}else {
+    echo "<script>alert(\"User ID not found\"); window.location.href = 'search-id.php';</script>";
+    die();
 }
+
 ?>
 <!DOCTYPE HTML>
 <html>
